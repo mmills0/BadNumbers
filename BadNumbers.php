@@ -14,6 +14,11 @@ class BadNumbers {
     $this->col = $col;
   }
 
+  /**
+   * Cleans the CSV and generates new CSV file(s).
+   * 
+   * @return string 
+   */
   public function clean() {
     $reason_missing  = array();
     $reason_areacode = array();
@@ -76,6 +81,11 @@ class BadNumbers {
     return $message;
   }
 
+  /**
+   * Checks a number a gives the reason for a number if it fails validation.
+   * 
+   * @return string 
+   */
   protected function reason( $number ) {
     $this->num = $number;
     $reason = 'pass';
@@ -94,6 +104,11 @@ class BadNumbers {
     return $reason;
   }
 
+  /**
+   * Checks if a number is a duplicate within an CSV file.
+   * 
+   * @return bool 
+   */
   protected function checkDupe() {
     if ( array_key_exists( $this->cleaned(), $this->allNumbersArr ) ) {
       return false;
@@ -103,28 +118,60 @@ class BadNumbers {
     }
   }
 
+  /**
+   * Checks if a number has an invalid area code.
+   * 
+   * @return bool 
+   */
   protected function checkAreaCode() {
     return ( in_array( $this->getAreaCode(), $this->badAreaCodeArr, true ) ) ? false : true;
   }
 
+  /**
+   * Checks if a number has an invalid length.
+   * 
+   * @return bool 
+   */
   protected function checkLength() {
     return ( 10 === strlen( $this->cleaned() ) ) ? true : false;
   }
 
+  /**
+   * Checks if a number is from a disallowed region.
+   * 
+   * @return bool 
+   */
   protected function checkRegion() {
     return ( in_array( $this->getAreaCode(), $this->badRegionArr, true ) ) ? false : true;
   }
 
+  /**
+   * Finds the area code of a phone number.
+   * 
+   * @return string 
+   */
   protected function getAreaCode() {
     return substr( $this->cleaned(), 0, 3 );
   }
 
+  /**
+   * Reduces phone numbers down to just numbers.
+   * 
+   * @return string 
+   */
   protected function cleaned() {
     $clean = (string) preg_replace( '/[^0-9]/', '', $this->num );
     $char1 = substr( $clean, 0, 1 );
     return ( '1' === $char1 ) ? substr( $clean, 1 ) : $clean;
   }
 
+  /**
+   * Creates a CSV file from an array.
+   * 
+   * @param Array  $arr The array of data.
+   * @param Array  $arr The header array.
+   * @param String $str The filename to use.
+   */
   protected function createCSV( $arr, $header, $filename ) {
     array_unshift( $arr, $header );
     $fp = fopen( $filename, 'w');
